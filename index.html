@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>리즘인들의 즐거운 점심시간!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #F7F6F3;
+      --card: #FFFFFF;
+      --text: #1A1A1A;
+      --sub: #6B6B6B;
+      --border: #E8E8E8;
+      --accent: #FF5A1F;
+      --accent-light: #FFF1EC;
+      --green: #12B76A;
+      --green-bg: #ECFDF3;
+      --yellow: #D97706;
+      --yellow-bg: #FFFBEB;
+      --red: #DC2626;
+      --red-bg: #FEF2F2;
+    }
+    body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── HEADER ── */
+    header {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 0.9rem 5%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo { font-size: 17.6px; font-weight: 900; letter-spacing: -0.528px; }
+    .logo em { color: var(--accent); font-style: normal; }
+    .time-badge {
+      background: #FFF1EC;
+      color: #FF5A1F;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4.8px 12px;
+      border-radius: 20px;
+    }
+
+    /* ── STATUS BAR ── */
+    .status-bar {
+      background: linear-gradient(176.31deg, #1C1C1C 0%, #2E2E2E 100%);
+      color: #fff;
+      padding: 1.8rem 5%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .status-left h1 {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: -1.28px;
+      line-height: 41.6px;
+      margin-bottom: 0.3rem;
+    }
+    .status-left h1 em { color: var(--accent); font-style: normal; }
+    .status-left p { font-size: 12.8px; opacity: 0.55; }
+    .status-pills { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+    .stat-pill {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 11.4px 17px;
+      text-align: center;
+      min-width: 80px;
+    }
+    .stat-pill .val { font-size: 20px; font-weight: 700; }
+    .stat-pill .lbl { font-size: 10.08px; opacity: 0.55; margin-top: 1.6px; }
+
+    /* ── WEATHER MANUAL ── */
+    .weather-manual {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 1.1rem 1.4rem;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+    .weather-manual.show { display: block; }
+    .weather-manual p { font-size: 0.82rem; color: var(--sub); margin-bottom: 0.7rem; }
+    .weather-options { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .weather-opt {
+      padding: 0.38rem 0.85rem;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      font-family: inherit;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .weather-opt.selected, .weather-opt:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+    /* ── MAIN ── */
+    main { max-width: 1080px; margin: 0 auto; padding: 2rem 5% 4rem; }
+
+    /* ── FILTER ROW ── */
+    .filter-row { display: flex; gap: 0.45rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .filter-chip {
+      padding: 0.36rem 0.85rem;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      font-size: 0.78rem;
+      font-family: inherit;
+      font-weight: 500;
+      color: var(--sub);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-chip.active, .filter-chip:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    /* ── SECTION HEADER ── */
+    .sec-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .featured-wrap .sec-header { justify-content: center; gap: 0.6rem; margin-bottom: calc(1rem + 16px); }
+    .sec-header h2 { font-size: 15.68px; font-weight: 700; letter-spacing: -0.3136px; }
+    .sec-header span { font-size: 12px; color: var(--sub); }
+
+    /* ── FEATURED CARD (TOP PICK) ── */
+    .featured-wrap { margin-bottom: 2.2rem; max-width: 560px; margin-left: auto; margin-right: auto; }
+    .featured-card {
+      background: #fff;
+      border: 2.5px solid var(--accent);
+      border-radius: 24px;
+      padding: 2.8rem 3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 1rem;
+      position: relative;
+      box-shadow: 0 8px 40px rgba(255,90,31,0.13);
+    }
+    .featured-emoji { font-size: 5.5rem; }
+    .featured-body { width: 100%; }
+    .featured-body h3 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; letter-spacing: -0.04em; margin-bottom: 0.5rem; }
+    .featured-body h3 em { color: var(--accent); font-style: normal; }
+    .featured-body .menu-tag { font-size: 1rem; color: var(--sub); margin-bottom: 0.8rem; }
+    .featured-body .reason { font-size: 0.95rem; color: var(--accent); font-weight: 500; }
+    .featured-badge {
+      position: absolute;
+      top: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #FF5A1F;
+      color: #fff;
+      font-size: 12.48px;
+      font-weight: 700;
+      letter-spacing: 0.4992px;
+      padding: 0.28rem 0.9rem;
+      border-radius: 20px;
+      white-space: nowrap;
+      text-align: center;
+    }
+    .featured-walk { text-align: center; }
+    .featured-walk .mins { font-size: 3.5rem; font-weight: 900; color: var(--green); line-height: 1; }
+    .featured-walk .mins-lbl { font-size: 0.85rem; color: var(--sub); margin-top: calc(0.3rem + 8px); }
+    .featured-walk .loc { font-size: 0.82rem; color: var(--sub); margin-top: 0.3rem; }
+
+    /* ── CARD GRID ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 0.9rem;
+    }
+    .menu-card {
+      background: var(--card);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 1.1rem;
+      transition: transform 0.16s, box-shadow 0.16s;
+      cursor: default;
+    }
+    .menu-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.07); }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.45rem; }
+    .card-name { font-size: 0.98rem; font-weight: 700; letter-spacing: -0.02em; }
+    .walk-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.18rem 0.5rem;
+      border-radius: 6px;
+      white-space: nowrap;
+      margin-left: 0.5rem;
+      flex-shrink: 0;
+    }
+    .walk-fast  { background: var(--green-bg);  color: var(--green); }
+    .walk-mid   { background: var(--yellow-bg); color: var(--yellow); }
+    .walk-slow  { background: var(--red-bg);    color: var(--red); }
+    .card-menu { font-size: 0.8rem; color: var(--sub); margin-bottom: 0.35rem; }
+    .card-loc  { font-size: 0.75rem; color: #AAA; }
+
+    /* ── LOADING ── */
+    #loading { text-align: center; padding: 3rem 0; }
+    .spinner {
+      width: 30px; height: 30px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 0.8rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.75rem;
+      color: var(--sub);
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 560px) {
+      .featured-card { flex-direction: column; text-align: center; }
+      .featured-walk { display: flex; gap: 1rem; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><em>🍱</em> 리즘인들의 즐거운 점심시간!</div>
+  <span class="time-badge">⏰ 13:00 ~ 14:00</span>
+</header>
+
+<div class="status-bar">
+  <div class="status-left">
+    <h1 id="hero-title">오늘 <em>뭐</em> 먹지?</h1>
+    <p>나강타워 주변 · 점심 1시간 기준</p>
+  </div>
+  <div class="status-pills">
+    <div class="stat-pill">
+      <div class="val" id="day-val">—</div>
+      <div class="lbl">요일</div>
+    </div>
+    <div class="stat-pill">
+      <div class="val" id="temp-val">—</div>
+      <div class="lbl">기온</div>
+    </div>
+    <div class="stat-pill">
+      <div class="val" id="wx-icon">—</div>
+      <div class="lbl" id="wx-lbl">날씨</div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <!-- 수동 날씨 선택 -->
+  <div class="weather-manual" id="weather-manual">
+    <p>현재 날씨를 선택해 주세요:</p>
+    <div class="weather-options">
+      <button class="weather-opt" onclick="setWeather('hot',this)">☀️ 덥고 맑음</button>
+      <button class="weather-opt" onclick="setWeather('mild',this)">🌤 따뜻함</button>
+      <button class="weather-opt" onclick="setWeather('cloudy',this)">☁️ 흐림</button>
+      <button class="weather-opt" onclick="setWeather('rainy',this)">🌧 비</button>
+      <button class="weather-opt" onclick="setWeather('cold',this)">🥶 쌀쌀함</button>
+    </div>
+  </div>
+
+  <!-- 로딩 -->
+  <div id="loading"><div class="spinner"></div><p style="font-size:.85rem;color:var(--sub)">날씨 확인 중...</p></div>
+
+  <!-- 콘텐츠 -->
+  <div id="content" style="display:none">
+    <!-- 대표 추천 -->
+    <div class="featured-wrap">
+      <div class="sec-header">
+        <h2>⭐ 오늘의 대표 추천</h2>
+        <span id="top-reason"></span>
+      </div>
+      <div id="top-card"></div>
+    </div>
+
+    <!-- 필터 -->
+    <div class="filter-row" id="filter-row"></div>
+
+    <!-- 전체 목록 -->
+    <div class="sec-header">
+      <h2>🗺 전체 식당 목록</h2>
+      <span id="list-count"></span>
+    </div>
+    <div class="card-grid" id="card-grid"></div>
+  </div>
+</main>
+
+<footer>📍 서울 강남구 역삼동 681-16 나강타워 기준 · 도보 시간은 실제와 다를 수 있습니다</footer>
+
+<script>
+// ── 식당 데이터 ───────────────────────────────────────────────────────────
+const RESTAURANTS = [
+  { name:'가츠몽',      menu:'돈까스',        cat:'돈까스', loc:'아크로힐스',  walk:5  },
+  { name:'흑돈',        menu:'돈까스',        cat:'돈까스', loc:'언주역',      walk:10 },
+  { name:'맥도날드',    menu:'햄버거',        cat:'햄버거', loc:'선정릉역',    walk:10 },
+  { name:'버거리',      menu:'햄버거',        cat:'햄버거', loc:'아크로힐스',  walk:5  },
+  { name:'프랭크 버거', menu:'햄버거',        cat:'햄버거', loc:'아크로힐스',  walk:5  },
+  { name:'슈퍼런 샐러드',menu:'샐러드',      cat:'샐러드', loc:'아크로힐스',  walk:5  },
+  { name:'포케올데이',  menu:'샐러드·포케',   cat:'샐러드', loc:'선정릉역',    walk:6  },
+  { name:'튜니니',      menu:'샌드위치',      cat:'샌드위치',loc:'선정릉역',   walk:6  },
+  { name:'서브웨이',    menu:'샌드위치',      cat:'샌드위치',loc:'선정릉역',   walk:4  },
+  { name:'나향반점',    menu:'중화요리',      cat:'중식',   loc:'회사 앞',     walk:3  },
+  { name:'한정남',      menu:'중화요리',      cat:'중식',   loc:'언주역',      walk:6  },
+  { name:'센자이료쿠',  menu:'라멘',          cat:'라멘',   loc:'아크로힐스',  walk:5  },
+  { name:'쿠시마켓',    menu:'라멘',          cat:'라멘',   loc:'아크로힐스',  walk:5  },
+  { name:'선초밥',      menu:'초밥',          cat:'일식',   loc:'회사 뒷편',   walk:2  },
+  { name:'신사약방',    menu:'평양냉면',      cat:'냉면',   loc:'선정릉역',    walk:5  },
+  { name:'서울갈매기',  menu:'한식',          cat:'한식',   loc:'회사 뒷편',   walk:2  },
+  { name:'태백식당',    menu:'한식',          cat:'한식',   loc:'선정릉역',    walk:6  },
+  { name:'롤리폴리',    menu:'오뚜기 메뉴',   cat:'한식',   loc:'선정릉역',    walk:6  },
+  { name:'세이텐',      menu:'텐동',          cat:'일식',   loc:'선정릉역',    walk:6  },
+  { name:'안목',        menu:'국밥',          cat:'국밥',   loc:'선릉역',      walk:8  },
+  { name:'온수반',      menu:'국밥',          cat:'국밥',   loc:'선릉역',      walk:8  },
+];
+
+// ── 날씨별 우선 카테고리 & 이모지 ─────────────────────────────────────────
+const WEATHER = {
+  hot:    { icon:'☀️', label:'덥고 맑음',   prefer:['냉면','샐러드','일식','샌드위치','햄버거'],  emoji:'🥗' },
+  mild:   { icon:'🌤', label:'따뜻하고 맑음',prefer:['일식','샌드위치','샐러드','돈까스','한식'], emoji:'🍱' },
+  cloudy: { icon:'☁️', label:'흐림',        prefer:['돈까스','중식','라멘','한식','일식'],         emoji:'🍜' },
+  rainy:  { icon:'🌧', label:'비',          prefer:['국밥','라멘','중식','한식','돈까스'],         emoji:'🍲' },
+  cold:   { icon:'🥶', label:'쌀쌀함',      prefer:['국밥','라멘','중식','돈까스','한식'],         emoji:'🍲' },
+};
+
+const DAY_KO = ['일','월','화','수','목','금','토'];
+const DAY_FULL = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+let currentWeather = null;
+const today = new Date().getDay();
+
+// ── 추천 점수 ─────────────────────────────────────────────────────────────
+function score(r, wx) {
+  const prefs = WEATHER[wx]?.prefer || [];
+  let s = 0;
+  const idx = prefs.indexOf(r.cat);
+  if (idx !== -1) s += (prefs.length - idx) * 2;   // 카테고리 적합도
+  if (r.walk <= 3) s += 4;                           // 거리 보너스
+  else if (r.walk <= 5) s += 2;
+  else if (r.walk <= 6) s += 1;
+  return s;
+}
+
+// ── 날씨 WMO 코드 → 조건 ─────────────────────────────────────────────────
+function wmoToCond(code, temp) {
+  if ([0,1].includes(code)) return temp >= 27 ? 'hot' : temp >= 14 ? 'mild' : 'cold';
+  if ([2,3].includes(code)) return temp < 10 ? 'cold' : 'cloudy';
+  if (code >= 51 && code <= 82) return 'rainy';
+  if (code >= 71 && code <= 77) return 'cold';
+  if (code >= 95) return 'rainy';
+  return temp < 10 ? 'cold' : 'mild';
+}
+
+// ── 날씨 UI 업데이트 ──────────────────────────────────────────────────────
+function applyWeather(wx, temp) {
+  const w = WEATHER[wx];
+  document.getElementById('wx-icon').textContent = w.icon;
+  document.getElementById('wx-lbl').textContent = w.label;
+  document.getElementById('temp-val').textContent = temp != null ? `${Math.round(temp)}°` : w.icon;
+  document.getElementById('hero-title').innerHTML =
+    `${DAY_FULL[today]} ${w.icon}<br><em>${w.label}</em>엔 이 집!`;
+  currentWeather = wx;
+  render(wx);
+}
+
+function setWeather(wx, btn) {
+  document.querySelectorAll('.weather-opt').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('weather-manual').classList.remove('show');
+  applyWeather(wx, null);
+}
+
+// ── 도보 배지 ─────────────────────────────────────────────────────────────
+function walkBadge(mins) {
+  if (mins <= 4) return `<span class="walk-badge walk-fast">🚶 ${mins}분</span>`;
+  if (mins <= 6) return `<span class="walk-badge walk-mid">🚶 ${mins}분</span>`;
+  return `<span class="walk-badge walk-slow">🚶 ${mins}분</span>`;
+}
+
+// ── 렌더링 ────────────────────────────────────────────────────────────────
+function render(wx) {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = 'block';
+
+  const sorted = [...RESTAURANTS].sort((a, b) => score(b, wx) - score(a, wx));
+  const top = sorted[0];
+  const w = WEATHER[wx];
+
+  // 대표 추천
+  document.getElementById('top-reason').textContent = `${w.icon} ${w.label} · ${DAY_FULL[today]} 기준`;
+  document.getElementById('top-card').innerHTML = `
+    <div class="featured-card">
+      <div class="featured-badge">⭐ 오늘의 추천</div>
+      <div class="featured-emoji">${w.emoji}</div>
+      <div class="featured-body">
+        <div class="menu-tag">${top.cat} · ${top.menu}</div>
+        <h3>${top.name}</h3>
+        <div class="reason">${w.label}에 딱 맞는 메뉴 · ${top.loc} 방향</div>
+      </div>
+      <div class="featured-walk">
+        <div class="mins">${top.walk}분</div>
+        <div class="mins-lbl">도보 · 📍 ${top.loc}</div>
+      </div>
+    </div>
+  `;
+
+  // 카테고리 필터
+  const cats = [...new Set(RESTAURANTS.map(r => r.cat))];
+  document.getElementById('filter-row').innerHTML =
+    `<button class="filter-chip active" onclick="filterCat('',this)">전체 (${RESTAURANTS.length})</button>` +
+    cats.map(c => {
+      const cnt = RESTAURANTS.filter(r => r.cat === c).length;
+      return `<button class="filter-chip" onclick="filterCat('${c}',this)">${c} (${cnt})</button>`;
+    }).join('');
+
+  // 전체 목록 (거리순)
+  const byWalk = [...RESTAURANTS].sort((a,b) => a.walk - b.walk);
+  document.getElementById('list-count').textContent = `총 ${byWalk.length}곳`;
+  document.getElementById('card-grid').innerHTML = byWalk.map(r => `
+    <div class="menu-card" data-cat="${r.cat}">
+      <div class="card-top">
+        <div class="card-name">${r.name}</div>
+        ${walkBadge(r.walk)}
+      </div>
+      <div class="card-menu">${r.menu}</div>
+      <div class="card-loc">📍 ${r.loc}</div>
+    </div>
+  `).join('');
+}
+
+function filterCat(cat, btn) {
+  document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.menu-card').forEach(c => {
+    c.style.display = (!cat || c.dataset.cat === cat) ? '' : 'none';
+  });
+}
+
+// ── 날씨 자동 조회 ────────────────────────────────────────────────────────
+document.getElementById('day-val').textContent = DAY_KO[today];
+
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(async pos => {
+    try {
+      const { latitude: lat, longitude: lon } = pos.coords;
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode`);
+      const d = await res.json();
+      applyWeather(wmoToCond(d.current.weathercode, d.current.temperature_2m), d.current.temperature_2m);
+    } catch { showManual(); }
+  }, showManual);
+} else { showManual(); }
+
+function showManual() {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('weather-manual').classList.add('show');
+  document.getElementById('content').style.display = 'block';
+  render('mild'); // 날씨 미선택 시 기본값
+}
+</script>
+</body>
+</html>
