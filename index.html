@@ -164,7 +164,9 @@
     .featured-body h3 { font-size: clamp(1.5rem, 2.5vw, 2.2rem); font-weight: 900; letter-spacing: -0.04em; margin-bottom: 0.5rem; }
     .featured-body h3 em { color: var(--accent); font-style: normal; }
     .featured-body .menu-tag { font-size: 0.9rem; color: var(--sub); margin-bottom: 0.6rem; }
-    .featured-body .reason { font-size: 0.85rem; color: var(--accent); font-weight: 500; }
+    .featured-body .reason { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+    .featured-body .reason-wx  { font-size: 0.85rem; color: var(--accent); font-weight: 500; }
+    .featured-body .reason-loc { font-size: 0.78rem; color: var(--sub); font-weight: 400; }
 
     .featured-badge {
       position: absolute;
@@ -217,7 +219,8 @@
     .walk-fast  { background: var(--green-bg);  color: var(--green); }
     .walk-mid   { background: var(--yellow-bg); color: var(--yellow); }
     .walk-slow  { background: var(--red-bg);    color: var(--red); }
-    .card-menu { font-size: 0.8rem; color: var(--sub); margin-bottom: 0.35rem; }
+    .card-meta-row { display: flex; align-items: center; justify-content: space-between; }
+    .card-menu { font-size: 0.8rem; color: var(--sub); }
     .card-loc  { font-size: 0.75rem; color: #AAA; }
 
     /* ── LOADING ── */
@@ -446,7 +449,10 @@ function render(wx) {
           <div class="featured-body">
             <div class="menu-tag">${r.cat} · ${r.menu}</div>
             <h3>${r.name}</h3>
-            <div class="reason">${w.label}에 딱 맞는 메뉴 · ${r.loc} 방향</div>
+            <div class="reason">
+              <span class="reason-wx">${w.label}에 딱 맞는 메뉴</span>
+              <span class="reason-loc">${r.loc} 방향</span>
+            </div>
           </div>
           <div class="featured-walk">
             <div class="mins">${r.walk}분</div>
@@ -475,8 +481,10 @@ function render(wx) {
         <div class="card-name">${r.name}</div>
         ${walkBadge(r.walk)}
       </div>
-      <div class="card-menu">${r.menu}</div>
-      <div class="card-loc">📍 ${r.loc}</div>
+      <div class="card-meta-row">
+        <span class="card-menu">${r.menu}</span>
+        <span class="card-loc">📍 ${r.loc}</span>
+      </div>
     </div>
   `).join('');
 }
