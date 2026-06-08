@@ -263,6 +263,10 @@
   </div>
   <div class="status-pills">
     <div class="stat-pill">
+      <div class="val" id="date-val">—</div>
+      <div class="lbl">날짜</div>
+    </div>
+    <div class="stat-pill">
       <div class="val" id="day-val">—</div>
       <div class="lbl">요일</div>
     </div>
@@ -322,7 +326,7 @@
 // ── 식당 데이터 ───────────────────────────────────────────────────────────
 const RESTAURANTS = [
   { name:'가츠몽',      menu:'돈까스',        cat:'돈까스', loc:'아크로힐스',  walk:5  },
-  { name:'흑돈',        menu:'돈까스',        cat:'돈까스', loc:'언주역',      walk:10 },
+  { name:'혼돈',        menu:'돈까스',        cat:'돈까스', loc:'언주역',      walk:10 },
   { name:'맥도날드',    menu:'햄버거',        cat:'햄버거', loc:'선정릉역',    walk:10 },
   { name:'버거리',      menu:'햄버거',        cat:'햄버거', loc:'아크로힐스',  walk:5  },
   { name:'프랭크 버거', menu:'햄버거',        cat:'햄버거', loc:'아크로힐스',  walk:5  },
@@ -343,6 +347,12 @@ const RESTAURANTS = [
   { name:'반포식스',    menu:'쌀국수',        cat:'쌀국수', loc:'선정릉역',    walk:6  },
   { name:'안목',        menu:'국밥',          cat:'국밥',   loc:'선릉역',      walk:8  },
   { name:'온수반',      menu:'국밥',          cat:'국밥',   loc:'선릉역',      walk:8  },
+  { name:'일등추어',    menu:'추어탕',        cat:'한식',   loc:'선정릉역',    walk:9  },
+  // ── 카페 (추천 제외, 목록에만 표시) ──
+  { name:'스타벅스',    menu:'커피·음료',     cat:'카페',   loc:'나강빌딩',    walk:1  },
+  { name:'투썸플레이스',menu:'커피·음료',     cat:'카페',   loc:'언주역',      walk:5  },
+  { name:'바나프레스',  menu:'커피·음료',     cat:'카페',   loc:'선정릉역',    walk:6  },
+  { name:'메가커피',    menu:'커피·음료',     cat:'카페',   loc:'선정릉역',    walk:4  },
 ];
 
 // ── 날씨별 우선 카테고리 & 이모지 ─────────────────────────────────────────
@@ -357,34 +367,34 @@ const WEATHER = {
 const DAY_KO   = ['일','월','화','수','목','금','토'];
 const DAY_FULL = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
 let currentWeather = null;
-const today = new Date().getDay();
+const today = new Date().getDay(); // 요일 표시용
 
-// ── 요일별 선호 카테고리 ──────────────────────────────────────────────────
-const DAY_PREFER = {
-  0: ['한식','국밥'],                      // 일
-  1: ['국밥','한식'],                      // 월 — 든든하게 시작
-  2: ['중식','라멘'],                      // 화
-  3: ['돈까스','텐동','중식'],             // 수 — 주중 특식
-  4: ['샐러드','샌드위치','라멘'],         // 목 — 가볍게
-  5: ['일식','텐동','햄버거','샐러드'],    // 금 — 주말 전 특식
-  6: ['한식','국밥','중식'],               // 토
-};
+// ── 날짜 기반 시드 랜덤 (같은 날은 동일, 날짜마다 다른 추천) ──────────────
+const _d = new Date();
+const DATE_KEY = _d.getFullYear() * 10000 + (_d.getMonth() + 1) * 100 + _d.getDate();
+
+function seededRand(seed) {
+  const x = Math.sin(seed + 1) * 10000;
+  return x - Math.floor(x);
+}
+
+function dailyBonus(name) {
+  const seed = name.split('').reduce((acc, c, i) => acc + c.charCodeAt(0) * (i + 1), DATE_KEY);
+  return Math.floor(seededRand(seed) * 14); // 0~13점 — 날씨 점수를 뒤집을 수 있는 범위
+}
 
 // ── 추천 점수 ─────────────────────────────────────────────────────────────
 function score(r, wx) {
   let s = 0;
-  // 날씨 점수
+  // 날씨 점수 (방향 제시, 최대 12점)
   const wxPrefs = WEATHER[wx]?.prefer || [];
   const wxIdx = wxPrefs.indexOf(r.cat);
   if (wxIdx !== -1) s += (wxPrefs.length - wxIdx) * 2;
-  // 요일 점수
-  const dayPrefs = DAY_PREFER[today] || [];
-  const dayIdx = dayPrefs.indexOf(r.cat);
-  if (dayIdx !== -1) s += (dayPrefs.length - dayIdx) * 2;
+  // 날짜별 랜덤 보너스 (0~13점 — 날마다 완전히 다른 결과)
+  s += dailyBonus(r.name);
   // 거리 보너스
-  if (r.walk <= 3) s += 4;
-  else if (r.walk <= 5) s += 2;
-  else if (r.walk <= 6) s += 1;
+  if (r.walk <= 3) s += 2;
+  else if (r.walk <= 5) s += 1;
   return s;
 }
 
@@ -392,8 +402,8 @@ function score(r, wx) {
 function wmoToCond(code, temp) {
   if ([0,1].includes(code)) return temp >= 27 ? 'hot' : temp >= 14 ? 'mild' : 'cold';
   if ([2,3].includes(code)) return temp < 10 ? 'cold' : 'cloudy';
-  if (code >= 51 && code <= 82) return 'rainy';
   if (code >= 71 && code <= 77) return 'cold';
+  if (code >= 51 && code <= 82) return 'rainy';
   if (code >= 95) return 'rainy';
   return temp < 10 ? 'cold' : 'mild';
 }
@@ -429,7 +439,7 @@ function render(wx) {
   document.getElementById('loading').style.display = 'none';
   document.getElementById('content').style.display = 'block';
 
-  const sorted = [...RESTAURANTS].sort((a, b) => score(b, wx) - score(a, wx));
+  const sorted = [...RESTAURANTS].filter(r => r.cat !== '카페').sort((a, b) => score(b, wx) - score(a, wx));
   const top3 = sorted.slice(0, 3);
   const w = WEATHER[wx];
 
@@ -499,6 +509,7 @@ function filterCat(cat, btn) {
 
 // ── 날씨 자동 조회 ────────────────────────────────────────────────────────
 document.getElementById('day-val').textContent = DAY_KO[today];
+document.getElementById('date-val').textContent = `${_d.getMonth() + 1}/${_d.getDate()}`;
 
 if (navigator.geolocation) {
   navigator.geolocation.getCurrentPosition(async pos => {
